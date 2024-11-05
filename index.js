@@ -2,14 +2,16 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+require('dotenv').config(); // Charger les variables d'environnement
 const { handleMessage } = require('./handles/handleMessage');
 const { handlePostback } = require('./handles/handlePostback');
 
 const app = express();
 app.use(express.json());
 
-const VERIFY_TOKEN = 'pagebot';
-const PAGE_ACCESS_TOKEN = fs.readFileSync('token.txt', 'utf8').trim();
+// Utiliser les variables d'environnement pour les tokens
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'pagebot';
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 const COMMANDS_PATH = path.join(__dirname, 'commands');
 
 // Webhook verification
@@ -32,7 +34,6 @@ app.post('/webhook', (req, res) => {
   const { body } = req;
 
   if (body.object === 'page') {
-    // Ensure entry and messaging exist before iterating
     body.entry?.forEach(entry => {
       entry.messaging?.forEach(event => {
         if (event.message) {
